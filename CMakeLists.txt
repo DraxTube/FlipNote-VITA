@@ -8,14 +8,14 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   endif()
 endif()
 
-project(FlipnoteVita)
+project(FlipnoteVita C)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 set(VITA_APP_NAME "Flipnote Vita")
 set(VITA_TITLEID  "FLIP00001")
 set(VITA_VERSION  "01.00")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-format-truncation -Wno-misleading-indentation -O2 -std=c99")
 
 add_executable(${PROJECT_NAME}
   src/main.c
@@ -36,7 +36,7 @@ target_link_libraries(${PROJECT_NAME}
   SceTouch_stub
   ScePgf_stub
   SceCommonDialog_stub
-  SceAudio_stub
+  SceAudioOut_stub
   SceAudioIn_stub
   SceAppMgr_stub
   SceIofilemgr_stub
