@@ -211,6 +211,7 @@ void drawing_bucket_fill(DrawingContext *ctx, int x, int y) {
     FillPoint *stack;
     int stack_top;
     int max_stack;
+    int cx2, cy2;
 
     if (x < 0 || x >= CANVAS_WIDTH || y < 0 || y >= CANVAS_HEIGHT) return;
 
@@ -229,7 +230,6 @@ void drawing_bucket_fill(DrawingContext *ctx, int x, int y) {
     stack_top++;
 
     while (stack_top > 0) {
-        int cx2, cy2;
         stack_top--;
         cx2 = stack[stack_top].x;
         cy2 = stack[stack_top].y;
