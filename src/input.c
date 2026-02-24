@@ -2,6 +2,8 @@
 #include "drawing.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <math.h>
 
 void input_init(void) {
@@ -77,30 +79,30 @@ void input_update(InputState *input) {
     }
 }
 
-int input_button_pressed(InputState *input, unsigned int button) {
+bool input_button_pressed(InputState *input, uint32_t button) {
     return (input->pressed & button) != 0;
 }
 
-int input_button_released(InputState *input, unsigned int button) {
+bool input_button_released(InputState *input, uint32_t button) {
     return (input->released & button) != 0;
 }
 
-int input_button_held(InputState *input, unsigned int button) {
+bool input_button_held(InputState *input, uint32_t button) {
     return (input->held & button) != 0;
 }
 
-int input_touch_to_canvas(InputState *input, int *canvas_x, int *canvas_y) {
+bool input_touch_to_canvas(InputState *input, int *canvas_x, int *canvas_y) {
     int cx, cy;
-    if (!input->touch_active) return 0;
+    if (!input->touch_active) return false;
 
     cx = input->touch_x - CANVAS_X;
     cy = input->touch_y - CANVAS_Y;
 
     if (cx < 0 || cx >= CANVAS_WIDTH || cy < 0 || cy >= CANVAS_HEIGHT) {
-        return 0;
+        return false;
     }
 
     *canvas_x = cx;
     *canvas_y = cy;
-    return 1;
+    return true;
 }
