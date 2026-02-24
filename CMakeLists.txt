@@ -36,7 +36,7 @@ target_link_libraries(${PROJECT_NAME}
   SceTouch_stub
   ScePgf_stub
   SceCommonDialog_stub
-  SceAudioOut_stub
+  SceAudio_stub
   SceAudioIn_stub
   SceAppMgr_stub
   SceIofilemgr_stub
