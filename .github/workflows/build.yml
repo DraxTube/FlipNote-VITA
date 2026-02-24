@@ -17,13 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install build tools
         run: |
           apk add --no-cache cmake make git
-          vdpm vita2d
-          vdpm libpng
-          vdpm zlib
-          vdpm freetype
 
       - name: Configure
         run: |
