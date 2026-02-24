@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define AUDIO_MARKER 0xADD100
 
@@ -22,7 +23,7 @@ void filemanager_generate_filename(char *buffer, int buffer_size) {
              time.hour, time.minute, time.second);
 }
 
-int filemanager_save(AnimationContext *anim, AudioContext *audio, const char *filename) {
+bool filemanager_save(AnimationContext *anim, AudioContext *audio, const char *filename) {
     SceUID fd;
     FNVHeader header;
     int f, l, i, total;
@@ -34,7 +35,7 @@ int filemanager_save(AnimationContext *anim, AudioContext *audio, const char *fi
     int count;
 
     fd = sceIoOpen(filename, SCE_O_WRONLY | SCE_O_CREAT | SCE_O_TRUNC, 0777);
-    if (fd < 0) return 0;
+    if (fd < 0) return false;
 
     memset(&header, 0, sizeof(header));
     memcpy(header.magic, "FNVT", 4);
@@ -96,11 +97,11 @@ int filemanager_save(AnimationContext *anim, AudioContext *audio, const char *fi
     }
 
     sceIoClose(fd);
-    return 1;
+    return true;
 }
 
-int filemanager_load(AnimationContext *anim, AudioContext *audio,
-                     DrawingContext *draw, const char *filename)
+bool filemanager_load(AnimationContext *anim, AudioContext *audio,
+                      DrawingContext *draw, const char *filename)
 {
     SceUID fd;
     FNVHeader header;
@@ -112,13 +113,13 @@ int filemanager_load(AnimationContext *anim, AudioContext *audio,
     int i;
 
     fd = sceIoOpen(filename, SCE_O_RDONLY, 0);
-    if (fd < 0) return 0;
+    if (fd < 0) return false;
 
     sceIoRead(fd, &header, sizeof(header));
 
     if (memcmp(header.magic, "FNVT", 4) != 0) {
         sceIoClose(fd);
-        return 0;
+        return false;
     }
 
     animation_free(anim);
@@ -185,10 +186,10 @@ int filemanager_load(AnimationContext *anim, AudioContext *audio,
     anim->current_frame = 0;
     animation_load_current_from_draw(anim, draw);
 
-    return 1;
+    return true;
 }
 
-int filemanager_delete(const char *filename) {
+bool filemanager_delete(const char *filename) {
     return sceIoRemove(filename) >= 0;
 }
 
@@ -232,7 +233,7 @@ int filemanager_list_saves(SaveSlotInfo *slots, int max_slots) {
     return count;
 }
 
-int filemanager_exists(const char *filename) {
+bool filemanager_exists(const char *filename) {
     SceIoStat stat;
     return sceIoGetstat(filename, &stat) >= 0;
 }
@@ -243,13 +244,13 @@ void filemanager_autosave(AnimationContext *anim, AudioContext *audio) {
     filemanager_save(anim, audio, path);
 }
 
-int filemanager_load_autosave(AnimationContext *anim, AudioContext *audio, DrawingContext *draw) {
+bool filemanager_load_autosave(AnimationContext *anim, AudioContext *audio, DrawingContext *draw) {
     char path[256];
     snprintf(path, sizeof(path), "%s_autosave.fnv", SAVE_DIR);
     return filemanager_load(anim, audio, draw, path);
 }
 
-int filemanager_export_gif(AnimationContext *anim, const char *filename) {
+bool filemanager_export_gif(AnimationContext *anim, const char *filename) {
     SceUID fd;
     int f, delay;
     uint8_t gif_header[13];
@@ -262,7 +263,7 @@ int filemanager_export_gif(AnimationContext *anim, const char *filename) {
     uint8_t trailer;
 
     fd = sceIoOpen(filename, SCE_O_WRONLY | SCE_O_CREAT | SCE_O_TRUNC, 0777);
-    if (fd < 0) return 0;
+    if (fd < 0) return false;
 
     gif_header[0] = 'G'; gif_header[1] = 'I'; gif_header[2] = 'F';
     gif_header[3] = '8'; gif_header[4] = '9'; gif_header[5] = 'a';
@@ -351,10 +352,10 @@ int filemanager_export_gif(AnimationContext *anim, const char *filename) {
     sceIoWrite(fd, &trailer, 1);
 
     sceIoClose(fd);
-    return 1;
+    return true;
 }
 
-int filemanager_export_png_sequence(AnimationContext *anim, const char *dirname) {
+bool filemanager_export_png_sequence(AnimationContext *anim, const char *dirname) {
     int f;
     char path[256];
 
@@ -364,10 +365,10 @@ int filemanager_export_png_sequence(AnimationContext *anim, const char *dirname)
         snprintf(path, sizeof(path), "%s/frame_%04d.bmp", dirname, f);
         filemanager_export_frame_png(anim, f, path);
     }
-    return 1;
+    return true;
 }
 
-int filemanager_export_frame_png(AnimationContext *anim, int frame, const char *filename) {
+bool filemanager_export_frame_png(AnimationContext *anim, int frame, const char *filename) {
     SceUID fd;
     uint32_t file_size;
     uint8_t bmp_header[54];
@@ -377,10 +378,10 @@ int filemanager_export_frame_png(AnimationContext *anim, int frame, const char *
     uint8_t pad_bytes[3] = {0, 0, 0};
     uint8_t pix;
 
-    if (frame < 0 || frame >= anim->frame_count) return 0;
+    if (frame < 0 || frame >= anim->frame_count) return false;
 
     fd = sceIoOpen(filename, SCE_O_WRONLY | SCE_O_CREAT | SCE_O_TRUNC, 0777);
-    if (fd < 0) return 0;
+    if (fd < 0) return false;
 
     padding = (4 - (CANVAS_WIDTH * 3) % 4) % 4;
     file_size = 54 + (CANVAS_WIDTH * 3 + padding) * CANVAS_HEIGHT;
@@ -418,5 +419,5 @@ int filemanager_export_frame_png(AnimationContext *anim, int frame, const char *
     }
 
     sceIoClose(fd);
-    return 1;
+    return true;
 }
