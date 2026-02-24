@@ -3,7 +3,6 @@
 
 #include <vita2d.h>
 
-// Colori principali Flipnote
 #define COLOR_WHITE       RGBA8(255, 255, 255, 255)
 #define COLOR_BLACK       RGBA8(0, 0, 0, 255)
 #define COLOR_RED         RGBA8(255, 0, 0, 255)
@@ -16,9 +15,8 @@
 #define COLOR_PINK        RGBA8(255, 192, 203, 255)
 #define COLOR_CYAN        RGBA8(0, 255, 255, 255)
 
-// Colori UI
-#define COLOR_BG_TOP      RGBA8(100, 149, 237, 255)    // Cornflower blue
-#define COLOR_BG_BOTTOM   RGBA8(245, 245, 220, 255)    // Beige
+#define COLOR_BG_TOP      RGBA8(100, 149, 237, 255)
+#define COLOR_BG_BOTTOM   RGBA8(245, 245, 220, 255)
 #define COLOR_CANVAS_BG   RGBA8(255, 255, 255, 255)
 #define COLOR_UI_DARK     RGBA8(50, 50, 50, 255)
 #define COLOR_UI_GRAY     RGBA8(128, 128, 128, 255)
@@ -36,12 +34,6 @@
 #define COLOR_FRAME_SEL   RGBA8(255, 200, 0, 255)
 #define COLOR_PLAYBACK_BG RGBA8(30, 30, 30, 240)
 
-// Colori layer
 #define LAYER_COLORS_COUNT 4
-static const unsigned int LAYER_PALETTE[3][LAYER_COLORS_COUNT] = {
-    { COLOR_WHITE, COLOR_BLACK, COLOR_RED, COLOR_BLUE },     // Layer 1
-    { COLOR_TRANSPARENT, COLOR_BLACK, COLOR_RED, COLOR_BLUE }, // Layer 2
-    { COLOR_TRANSPARENT, COLOR_BLACK, COLOR_RED, COLOR_BLUE }  // Layer 3
-};
 
 #endif
