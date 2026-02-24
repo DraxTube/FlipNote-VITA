@@ -1,0 +1,81 @@
+name: Build FlipnoteVita
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: vitasdk/vitasdk:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apk add --no-cache cmake make git
+          vdpm vita2d
+          vdpm libpng
+          vdpm zlib
+          vdpm freetype
+
+      - name: Configure
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake
+
+      - name: Build
+        run: |
+          cd build
+          make -j$(nproc)
+
+      - name: Upload VPK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlipnoteVita-vpk
+          path: build/*.vpk
+          if-no-files-found: error
+
+      - name: Upload SELF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlipnoteVita-self
+          path: build/*.self
+          if-no-files-found: warn
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Download VPK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FlipnoteVita-vpk
+          path: ./artifacts
+
+      - name: Get date
+        id: date
+        run: echo "date=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: build-${{ steps.date.outputs.date }}
+          name: FlipnoteVita Build ${{ steps.date.outputs.date }}
+          body: |
+            Automated build of FlipnoteVita
+            Commit: ${{ github.sha }}
+          files: ./artifacts/*.vpk
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
